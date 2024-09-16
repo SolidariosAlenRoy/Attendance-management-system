@@ -24,7 +24,7 @@
             </tbody>
         </table>
 
-        <a href="student-attendance.html" class="back-link">Back to Student Attendance</a>
+        <a href="studentdata.php" class="back-link">Back to Student Attendance</a>
     </div>
 </body>
 </html>

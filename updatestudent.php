@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Student</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/updatestudent.css">
 </head>
 <body>
     <div class="container">
@@ -19,7 +19,7 @@
             <button type="submit">Update Student</button>
         </form>
 
-        <a href="student-attendance.html" class="back-link">Back to Student Attendance</a>
+        <a href="studentdata.php" class="back-link">Back to Student Attendance</a>
     </div>
 </body>
 </html>

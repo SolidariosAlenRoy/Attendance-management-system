@@ -85,7 +85,7 @@
                     <!-- Options will be populated dynamically -->
                 </select>
 
-                <button id="add-student">Add Student</button>
+                <button onclick="window.location.href='addstudent.php';">Add Student</button>
             </div>
 
             <h1>Student Attendance</h1>
@@ -103,16 +103,44 @@
                 </thead>
                 <tbody id="attendance-body">
                     <!-- Rows will be populated dynamically -->
+                    <tr>
+                        <td>John Doe</td>
+                        <td>2023-09-15</td>
+                        <td>Math</td>
+                        <td>10:00 AM</td>
+                        <td>
+                            <select>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                            </select>
+                        </td>
+                        <td>
+                        <button onclick="window.location.href='updatestudent.php?id=1';">Update</button>
+                        <button onclick="deleteStudent(1);">Delete</button>
+
+                        </td>
+                    </tr>
+                    <!-- Additional rows can be added here dynamically -->
                 </tbody>
             </table>
 
             <div class="actions">
-                <button id="save-draft">Save Draft</button>
-                <button id="attendance-report">Attendance Report</button>
+                <button onclick="window.location.href='savedraft.php';">Save Draft</button>
+                <button onclick="window.location.href='attendancereport.php';">Attendance Report</button>
             </div>
         </div>
     </div>
     
     <script src="js/studentdata.js"></script>
+    
+    <script>
+        function deleteStudent(studentId) {
+            // Here you can add confirmation prompt if needed
+            if (confirm('Are you sure you want to delete this student?')) {
+                // This will be replaced with actual server-side delete logic
+                window.location.href = 'deletestudent.php?id=' + studentId;
+            }
+        }
+    </script>
 </body>
 </html>
