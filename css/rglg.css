@@ -1,10 +1,13 @@
-.container {
+body {
+  background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(175,222,213,1) 100%); 
+}
+body .container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   padding: 0 30px;
-  background: linear-gradient(135deg, rgba(34,193,195,1) 0%, rgba(45,253,156,1) 50%, rgba(253,187,45,1) 100%);
+  background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(175,222,213,1) 100%);
 }
 
 .image-container {
@@ -50,20 +53,22 @@ p {
   border-radius: 5px;
 }
 .remember-me {
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   margin-bottom: 10px;
 }
 
 .remember-me input[type="checkbox"] {
   margin-right: 5px; 
-  display: inline-block;
+  display: inline; /* Change display property */
 }
 
 .remember-me label {
   font-size: 14px;
   color: #333;
+  display: inline; /* Change display property */
 }
+
 
 .reg-link {
   font-size: 16px;
