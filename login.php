@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Attendance Management System</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/rglg.css">
 </head>
 <body>
   <div class="container">
     <!-- Left side for the image -->
     <div class="image-container">
-      <img src="ClassTrack.png" alt="Classroom" class="side-image"> <!-- Replace 'ClassTrack.png' with the actual image path -->
+      <img src="image/ClassTrack.png" alt="Classroom" class="side-image"> <!-- Replace 'ClassTrack.png' with the actual image path -->
     </div>
 
     <!-- Right side for the login form -->
@@ -50,6 +50,6 @@
       <a href="register.php" class="reg-link">Sign-Up</a>
     </div>
   </div>
-  <script src="script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>

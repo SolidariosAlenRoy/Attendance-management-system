@@ -41,14 +41,10 @@
                 <i class="uil uil-check-circle"></i>
                     <span class="link-name">Attendance Submit</span>
                 </a></li>
-                <li><a href="#">
-                    <i class="uil uil-share"></i>
-                    <span class="link-name">Share</span>
-                </a></li>
             </ul>
             
             <ul class="logout-mode">
-                <li><a href="#">
+                <li><a href="logout.php">
                     <i class="uil uil-signout"></i>
                     <span class="link-name">Logout</span>
                 </a></li>
@@ -88,13 +84,17 @@
 
                 <div class="boxes">
                     <div class="box box1">
-                    <i class="uil uil-user"></i>
+                        <a href="addstudent.php">
+                        <i class="uil uil-user"></i>
                         <span class="text">Add Student</span>
+                        </a>
                         
                     </div>
                     <div class="box box2">
+                        <a href="updatestudent.php">
                         <i class="uil uil-sync"></i>
                         <span class="text">Update Student</span>
+                        </a>
                         
                     </div>
                     <div class="box box3">
