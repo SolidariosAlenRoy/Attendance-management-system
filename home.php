@@ -33,7 +33,7 @@
                     <i class="uil uil-clipboard"></i>
                     <span class="link-name">Attendance Report</span>
                 </a></li>
-                <li><a href="#">
+                <li><a href="schedule.php">
                     <i class="uil uil-schedule"></i>
                     <span class="link-name">Schedule</span>
                 </a></li>
