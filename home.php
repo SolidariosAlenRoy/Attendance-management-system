@@ -33,10 +33,6 @@
                     <i class="uil uil-clipboard"></i>
                     <span class="link-name">Attendance Report</span>
                 </a></li>
-                <li><a href="schedule.php">
-                    <i class="uil uil-schedule"></i>
-                    <span class="link-name">Schedule</span>
-                </a></li>
                 <li><a href="savedraft.php">
                 <i class="uil uil-check-circle"></i>
                     <span class="link-name">Attendance Submit</span>
@@ -44,7 +40,7 @@
             </ul>
             
             <ul class="logout-mode">
-                <li><a href="logout.php">
+                <li><a href="login.php">
                     <i class="uil uil-signout"></i>
                     <span class="link-name">Logout</span>
                 </a></li>
@@ -91,15 +87,18 @@
                         
                     </div>
                     <div class="box box2">
-                        <a href="updatestudent.php">
-                        <i class="uil uil-sync"></i>
-                        <span class="text">Update Student</span>
+                        <a href="schedule.php">
+                        <i class="uil uil-schedule"></i>
+                        <span class="text">Schedule</span>
                         </a>
                         
                     </div>
                     <div class="box box3">
-                    <i class="uil uil-list-ui-alt"></i>
+                        <a href="classlist.php">
+                        <i class="uil uil-list-ui-alt"></i>
                         <span class="text">Class List</span>
+                        </a>
+
                         
                     </div>
                 </div>

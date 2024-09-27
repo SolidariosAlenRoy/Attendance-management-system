@@ -1,3 +1,32 @@
+<?php
+
+require_once("dbConnection.php");
+
+
+// Database connection
+$conn = new mysqli('localhost', 'root', '', 'student');
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch absent students
+$sql = "SELECT s.student_name, s.guardian_email, s.guardian_phone
+        FROM students s
+        JOIN attendance a ON s.student_id = a.student_id
+        WHERE a.status = 'Absent'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        echo "Name: " . $row['student_name'] . " - Email: " . $row['guardian_email'] . " - Phone: " . $row['guardian_phone'] . "<br>";
+    }
+} else {
+    echo "No absent students.";
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
