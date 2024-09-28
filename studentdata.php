@@ -219,8 +219,10 @@ if (mysqli_num_rows($result) == 0) {
             </tbody>
         </table>
         <div class="actions-container">
+        <form action="attendancereport.php" method="POST">
         <button class="save-draft" onclick="window.location.href='savedraft.php';">Send Email</button>
-            <button class="attendance-report" onclick="window.location.href='attendancereport.php?section=' + $('#section').val();">Attendance Report</button>
+            <button type="submit" class="attendance-report">Attendance Report</button>
+        </form>
         </div>
     </div>
 </section>
