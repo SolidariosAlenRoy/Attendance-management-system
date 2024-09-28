@@ -64,7 +64,7 @@ $conn->close();
             <button onclick="generateEmails()">Generate Email Drafts</button>
         </div>
     </div>
-
+    
     <script>
         function generateEmails() {
             const rows = document.querySelectorAll('.students-table tbody tr:not(:first-child)'); // Exclude header row
