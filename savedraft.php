@@ -1,27 +1,22 @@
 <?php
-
-require_once("dbConnection.php");
-
-
-// Database connection
-$conn = new mysqli('localhost', 'root', '', 'student');
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once("dbconnection.php");
 
 // Fetch absent students
 $sql = "SELECT s.student_name, s.guardian_email, s.guardian_phone
         FROM students s
-        JOIN attendance a ON s.student_id = a.student_id
-        WHERE a.status = 'Absent'";
+        JOIN attendance a ON s.id = a.student_id
+        WHERE a.attendance_status = 'Absent'";
+
 $result = $conn->query($sql);
 
+// Check if there are absent students
+$rows = [];
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        echo "Name: " . $row['student_name'] . " - Email: " . $row['guardian_email'] . " - Phone: " . $row['guardian_phone'] . "<br>";
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
     }
 } else {
-    echo "No absent students.";
+    $rows = [];
 }
 
 $conn->close();
@@ -32,14 +27,14 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Save Draft</title>
+    <title>Attendance Notification</title>
     <link rel="stylesheet" href="css/savedraft.css">
 </head>
 <body>
     <div class="container">
-        <h1>Submit Attendance</h1>
+        <h1>Absent Students Notification</h1>
         <div class="students-list">
-            <h2>Student List</h2>
+            <h2>Absent Students List</h2>
             <table class="students-table">
                 <thead>
                     <tr>
@@ -48,6 +43,21 @@ $conn->close();
                         <th>Guardian's Phone Number</th>
                     </tr>
                 </thead>
+                <tbody>
+                    <?php if (!empty($rows)): ?>
+                        <?php foreach ($rows as $row): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['student_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['guardian_email']); ?></td>
+                                <td><?php echo htmlspecialchars($row['guardian_phone']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3">No absent students.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
             </table>
         </div>
         <div class="form-group">
@@ -55,6 +65,21 @@ $conn->close();
         </div>
     </div>
 
-    <script src="js/savedraft.js"></script>
+    <script>
+        function generateEmails() {
+            const rows = document.querySelectorAll('.students-table tbody tr:not(:first-child)'); // Exclude header row
+            rows.forEach(row => {
+                const studentName = row.cells[0].textContent;
+                const guardianEmail = row.cells[1].textContent;
+
+                // Email body informing about absence
+                const emailBody = `Dear Guardian,\n\nWe would like to inform you that ${studentName} was absent today.\n\nBest regards,\nYour School`;
+                const mailtoLink = `mailto:${guardianEmail}?subject=Attendance Notification&body=${encodeURIComponent(emailBody)}`;
+
+                // Open mailto link for each student's guardian
+                window.open(mailtoLink, '_blank');
+            });
+        }
+    </script>
 </body>
 </html>
