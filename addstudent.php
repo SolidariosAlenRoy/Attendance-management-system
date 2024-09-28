@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $last_id = $conn->insert_id;
 
         // Prepare and execute the statement to insert into the 'attendance' table
-        $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, subject, time, attendance_status) VALUES (?, CURDATE(), 'Math', CURTIME(), 'Present')");
+        $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, subject, time, attendance_status) VALUES (?, CURDATE(), '', CURTIME(), 'Select')");
         $stmt_attendance->bind_param("i", $last_id);
         
         // Execute the attendance insertion
