@@ -10,7 +10,7 @@ if ($conn->connect_error) {
 // Fetch attendance data
 $sql = "SELECT s.student_name, a.date, a.subject, a.time, a.attendance_status
         FROM students s
-        INNER JOIN attendance a ON s.id = a.student_id"; // Adjusted to match the correct column names
+        JOIN attendance a ON s.id = a.student_id"; // Adjusted to match the correct column names
 $result = $conn->query($sql);
 
 // Function to download CSV

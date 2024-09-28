@@ -11,7 +11,7 @@ $section_result = mysqli_query($conn, $section_query);
 $query = "
     SELECT s.id, s.student_name, a.date, a.subject, a.time, a.attendance_status 
     FROM students s
-    LEFT JOIN attendance a ON s.id = a.student_id
+    LEFT JOIN attendance a ON s.id = a.student_id`
 ";
 
 if ($selected_section != '' && $selected_section != 'select_section') {
