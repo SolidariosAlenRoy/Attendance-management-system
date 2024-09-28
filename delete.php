@@ -36,13 +36,6 @@ if (isset($_GET['id'])) {
                 // Close the prepared statement for deletion
                 $deleteStmt->close();
 
-                // Step 3: Reassign IDs for remaining records
-                $resetIdQuery = "SET @count = 0; UPDATE students SET id = (@count := @count + 1) WHERE id IS NOT NULL;";
-                $conn->query($resetIdQuery);
-                
-                // Step 4: Reset the auto-increment value
-                $conn->query("ALTER TABLE students AUTO_INCREMENT = 1;");
-
                 // Commit the transaction
                 $conn->commit();
 
