@@ -109,6 +109,12 @@ $conn->close();
                 window.open(mailtoLink, '_blank');
             });
         }
+        //This thing is for Gmail
+        /* const emailBody = `Dear Guardian,\n\nWe would like to inform you that ${studentName} was absent today.\n\nBest regards,\nYour School`;
+        
+        const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${guardianEmail}&su=Attendance Notification&body=${encodeURIComponent(emailBody)}`;
+        
+        window.open(gmailLink, '_blank'); */
     </script>
 </body>
 </html>
