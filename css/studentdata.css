@@ -379,15 +379,7 @@ nav.close ~ .dashboard .top {
 }
 
 /* === Attendance Page Styles === */
-.container {
-    max-width: 1000px;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 100px;
-    margin-left: 50px;
-    justify-content: center;
-}
+
 
 .controls, .actions {
     display: flex;
@@ -401,15 +393,19 @@ label, select, button {
 
 select, button {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 5px solid #ccc;
     border-radius: 4px;
 }
 
 button {
-    background-color: #007bff;
+    padding: 10px 20px; /* Controls internal spacing inside the button */
+    background-color: var(--primary-color); /* Use your primary color */
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px; /* Adds space between buttons */
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -479,3 +475,4 @@ td .btn-container .update-btn:hover {
 td .btn-container .delete-btn:hover {
     background-color: #c82333;
 }
+

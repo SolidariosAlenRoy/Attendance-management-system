@@ -94,6 +94,26 @@ if (mysqli_num_rows($result) == 0) {
                 success: function(data) {
                     $('#student-table-body').html(data);
                 }
+
+        $(document).ready(function() {
+            function fetchStudents() {
+                var selectedSection = $('#section').val();
+                var selectedSubject = $('#subject').val();
+                $.ajax({
+                    type: 'POST',
+                    url: 'fetchstudent.php',
+                    data: {section: selectedSection, subject: selectedSubject},
+                    success: function(data) {
+                        $('#student-table-body').html(data);
+                    }
+                });            }
+
+            // Fetch students based on selected section or subject
+            $('#section, #subject').change(function() {
+                fetchStudents();
+                // When a subject is changed, update the subject in the table
+                var newSubject = $('#subject').val();
+                $('.subject').text(newSubject);
             });
         }
 
@@ -225,12 +245,11 @@ if (mysqli_num_rows($result) == 0) {
             </tbody>
         </table>
         <div class="actions-container">
-        <form action="attendancereport.php" method="POST">
-        <button class="save-draft" onclick="window.location.href='savedraft.php';">Send Email</button>
-            <button type="submit" class="attendance-report">Attendance Report</button>
-        </form>
-        </div>
-    </div>
+    <button class="save-draft" onclick="window.location.href='savedraft.php';">Send Email</button>
+    <button class="attendance-report" onclick="window.location.href='attendancereport.php';">Attendance Report</button>
+    </form>
+</div>
+</div>
 </section>
 </body>
 </html>
