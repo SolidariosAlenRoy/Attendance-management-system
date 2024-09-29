@@ -18,12 +18,12 @@ $query = "
 $conditions = [];
 $params = [];
 
-if ($selected_section != '' && $selected_section != 'select_section') {
+if (!empty($selected_section) && $selected_section != 'select_section') {
     $conditions[] = "s.section = ?";
     $params[] = $selected_section;
 }
 
-if ($selected_subject != '') {
+if (!empty($selected_subject)) {
     $conditions[] = "a.subject = ?";
     $params[] = $selected_subject;
 }
@@ -46,8 +46,8 @@ if (mysqli_num_rows($result) == 0) {
     $output = "<tr><td colspan='6'>No students found for the selected filters.</td></tr>";
 } else {
     while ($row = mysqli_fetch_assoc($result)) {
-        // Ensure time is formatted correctly
-        $formattedTime = date('H:i:s', strtotime($row['time'])); // Format time here
+        $formattedTime = !empty($row['time']) ? date('H:i:s', strtotime($row['time'])) : ''; // Ensure time is formatted correctly
+
         $output .= "<tr>";
         $output .= "<td>" . htmlspecialchars($row['student_name']) . "</td>";
         $output .= "<td class='date'>" . htmlspecialchars($row['date']) . "</td>";
@@ -83,6 +83,18 @@ if (mysqli_num_rows($result) == 0) {
     <title>Student Attendance</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+    $(document).ready(function() {
+        function fetchStudents() {
+            var selectedSection = $('#section').val();
+            var selectedSubject = $('#subject').val();
+            $.ajax({
+                type: 'POST',
+                url: 'fetchstudent.php',
+                data: {section: selectedSection, subject: selectedSubject},
+                success: function(data) {
+                    $('#student-table-body').html(data);
+                }
+
         $(document).ready(function() {
             function fetchStudents() {
                 var selectedSection = $('#section').val();
@@ -103,52 +115,67 @@ if (mysqli_num_rows($result) == 0) {
                 var newSubject = $('#subject').val();
                 $('.subject').text(newSubject);
             });
+        }
 
-            // Update attendance status
-            $(document).on('change', '.attendance-status', function() {
-                var studentId = $(this).data('student-id');
-                var attendanceStatus = $(this).val();
-                // Here you can implement an AJAX call to save the attendance status
-                $.ajax({
-                    type: 'POST',
-                    url: 'updateAttendance.php', // Your update attendance PHP file
-                    data: {id: studentId, status: attendanceStatus},
-                    success: function(response) {
-                        console.log('Attendance updated:', response);
-                    }
-                });
+        // Fetch students based on selected section or subject
+        $('#section, #subject').change(function() {
+            fetchStudents();
+            var newSubject = $('#subject').val();
+            $('.subject').each(function() {
+                $(this).text(newSubject); // Update subject in all rows
             });
-
-            // Update current date and time in real-time
-            function updateDateTime() {
-                const now = new Date();
-                const formattedDate = now.toLocaleDateString(); // Format as desired
-                const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format time correctly
-                $('.date').text(formattedDate);
-                $('.time').text(formattedTime);
-            }
-
-            setInterval(updateDateTime, 1000); // Update every second
-
-            // Update sidebar state based on localStorage
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-            sidebarToggle.addEventListener('click', () => {
-                const sidebar = document.querySelector("nav");
-                const dashboard = document.querySelector(".dashboard");
-
-                sidebar.classList.toggle("close");
-                dashboard.classList.toggle("full-width");
-
-                localStorage.setItem("status", sidebar.classList.contains("close") ? "close" : "open");
-            });
-
-            // Restore sidebar state
-            if (localStorage.getItem("status") === "close") {
-                $("nav").addClass("close");
-                $(".dashboard").addClass("full-width");
-            }
         });
-    </script>
+
+        // Update attendance status
+        $(document).on('change', '.attendance-status', function() {
+            var studentId = $(this).data('student-id');
+            var attendanceStatus = $(this).val();
+            $.ajax({
+                type: 'POST',
+                url: 'updateAttendance.php',
+                data: {id: studentId, status: attendanceStatus},
+                success: function(response) {
+                    console.log('Attendance updated:', response);
+                }
+            });
+        });
+
+        // Update current date and time in real-time
+        function updateDateTime() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+            const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Update all date and time cells dynamically
+            $('.date').each(function() {
+                $(this).text(formattedDate);
+            });
+            $('.time').each(function() {
+                $(this).text(formattedTime);
+            });
+        }
+
+        setInterval(updateDateTime, 1000);
+
+        // Sidebar toggle and localStorage handling
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        sidebarToggle.addEventListener('click', () => {
+            const sidebar = document.querySelector("nav");
+            const dashboard = document.querySelector(".dashboard");
+
+            sidebar.classList.toggle("close");
+            dashboard.classList.toggle("full-width");
+
+            localStorage.setItem("status", sidebar.classList.contains("close") ? "close" : "open");
+        });
+
+        if (localStorage.getItem("status") === "close") {
+            $("nav").addClass("close");
+            $(".dashboard").addClass("full-width");
+        }
+    });
+</script>
+
 </head>
 <body>
 <nav>

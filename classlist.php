@@ -71,6 +71,7 @@ $result = mysqli_stmt_get_result($stmt);
                 } ?>
             </tbody>
         </table>
+        <a href="studentdata.php" class="back-link">Back to Student Attendance</a>
     </div>
 </body>
 </html>
