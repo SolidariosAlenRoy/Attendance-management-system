@@ -28,41 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['download'])) {
     }
     fclose($output);
     exit();
-
-    // Function to delete a record and fill the gap
-function deleteAndFillGap($id) {
-    global $conn;
-
-    // Start a transaction
-    $conn->begin_transaction();
-
-    try {
-        // Step 1: Delete the record
-        $deleteSql = "DELETE FROM students WHERE id = ?";
-        $stmt = $conn->prepare($deleteSql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-
-        // Step 2: Update subsequent records to fill the gap
-        $updateSql = "UPDATE students SET id = id - 1 WHERE id > ?";
-        $stmt = $conn->prepare($updateSql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-
-        // Commit the transaction
-        $conn->commit();
-        echo "Record deleted and gap filled successfully.";
-    } catch (Exception $e) {
-        // Rollback the transaction in case of error
-        $conn->rollback();
-        echo "Error: " . $e->getMessage();
-    }
-}
-
-// Call the function with the ID of the record you want to delete
-deleteAndFillGap(4); // For example, to delete record with ID 4
 }
 ?>
 

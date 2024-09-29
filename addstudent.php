@@ -10,36 +10,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Prepare the SQL statement for inserting into the 'students' table
     $stmt = $conn->prepare("INSERT INTO students (student_name, section, guardian_email, guardian_phone) VALUES (?, ?, ?, ?)");
     
-    // Bind parameters
+    // Bind parameters and execute
     $stmt->bind_param("ssss", $student_name, $section, $guardian_email, $guardian_phone);
 
-    // Execute the statement
     if ($stmt->execute()) {
-        // Get the last inserted student ID
-        $last_id = $conn->insert_id;
+        $last_id = $conn->insert_id; // Get last inserted student ID
 
-        // Prepare and execute the statement to insert into the 'attendance' table
+        // Insert into the 'attendance' table
         $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, subject, time, attendance_status) VALUES (?, CURDATE(), '', CURTIME(), 'Select')");
         $stmt_attendance->bind_param("i", $last_id);
-        
-        // Execute the attendance insertion
+
         if ($stmt_attendance->execute()) {
-            // Redirect to classlist.php after successfully adding the student and attendance record
-            header("Location: classlist.php");
+            header("Location: classlist.php"); // Redirect upon success
             exit();
         } else {
             echo "Error adding attendance record: " . $stmt_attendance->error;
         }
 
-        // Close the attendance statement
-        $stmt_attendance->close();
+        $stmt_attendance->close(); // Close attendance statement
 
     } else {
         echo "Error adding student: " . $stmt->error;
     }
 
-    // Close the statement
-    $stmt->close();
+    $stmt->close(); // Close student insert statement
 }
 ?>
 

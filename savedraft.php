@@ -67,19 +67,40 @@ $conn->close();
     
     <script>
         function generateEmails() {
-            const rows = document.querySelectorAll('.students-table tbody tr:not(:first-child)'); // Exclude header row
-            rows.forEach(row => {
-                const studentName = row.cells[0].textContent;
-                const guardianEmail = row.cells[1].textContent;
+    const rows = document.querySelectorAll('.students-table tbody tr');
+    const emailAddresses = [];
+    let emailBody = "Dear Guardians,\n\nWe would like to inform you that the following students were absent today:\n\n";
+    
+    if (rows.length === 1 && rows[0].cells[0].colSpan === 3) {
+        alert("No absent students to notify.");
+        return;
+    }
+    
+    rows.forEach(row => {
+        const studentName = row.cells[0].textContent.trim();
+        const guardianEmail = row.cells[1].textContent.trim();
 
-                // Email body informing about absence
-                const emailBody = `Dear Guardian,\n\nWe would like to inform you that ${studentName} was absent today.\n\nBest regards,\nYour School`;
-                const mailtoLink = `mailto:${guardianEmail}?subject=Attendance Notification&body=${encodeURIComponent(emailBody)}`;
-
-                // Open mailto link for each student's guardian
-                window.open(mailtoLink, '_blank');
-            });
+        if (guardianEmail && !emailAddresses.includes(guardianEmail)) {
+            emailAddresses.push(guardianEmail);
         }
+        
+        emailBody += `- ${studentName}\n`;
+    });
+
+    emailBody += "\nBest regards,\nYour School";
+    const subject = "Attendance Notification";
+    
+    if (emailAddresses.length > 0) {
+        const mailtoLink = `mailto:${emailAddresses.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+        
+        // Open mailto link in a new tab
+        window.open(mailtoLink, '_blank');
+    } else {
+        alert("No valid guardian emails found.");
+    }
+}
+
+
     </script>
 </body>
 </html>
