@@ -46,13 +46,13 @@ if (mysqli_num_rows($result) == 0) {
     $output = "<tr><td colspan='6'>No students found for the selected filters.</td></tr>";
 } else {
     while ($row = mysqli_fetch_assoc($result)) {
-        $formattedTime = !empty($row['time']) ? date('H:i:s', strtotime($row['time'])) : ''; // Ensure time is formatted correctly
+        $formattedTime = !empty($row['time']) ? date('H:i:s', strtotime($row['time'])) : '';
 
         $output .= "<tr>";
         $output .= "<td>" . htmlspecialchars($row['student_name']) . "</td>";
         $output .= "<td class='date'>" . htmlspecialchars($row['date']) . "</td>";
         $output .= "<td class='subject'>" . htmlspecialchars($row['subject'] ?? '') . "</td>";
-        $output .= "<td class='time'>" . htmlspecialchars($formattedTime) . "</td>"; // Display formatted time
+        $output .= "<td class='time'>" . htmlspecialchars($formattedTime) . "</td>";
         $output .= "<td>
                         <select class='attendance-status' data-student-id='" . $row['id'] . "'>
                             <option value=''>Select</option>
@@ -92,38 +92,13 @@ if (mysqli_num_rows($result) == 0) {
                 url: 'fetchstudent.php',
                 data: {section: selectedSection, subject: selectedSubject},
                 success: function(data) {
-                    $('#student-table-body').html(data);
-                }
-
-        $(document).ready(function() {
-            function fetchStudents() {
-                var selectedSection = $('#section').val();
-                var selectedSubject = $('#subject').val();
-                $.ajax({
-                    type: 'POST',
-                    url: 'fetchstudent.php',
-                    data: {section: selectedSection, subject: selectedSubject},
-                    success: function(data) {
-                        $('#student-table-body').html(data);
-                    }
-                });            }
-
-            // Fetch students based on selected section or subject
-            $('#section, #subject').change(function() {
-                fetchStudents();
-                // When a subject is changed, update the subject in the table
-                var newSubject = $('#subject').val();
-                $('.subject').text(newSubject);
+                    $('#student-table-body').html(data);                }
             });
         }
 
         // Fetch students based on selected section or subject
         $('#section, #subject').change(function() {
             fetchStudents();
-            var newSubject = $('#subject').val();
-            $('.subject').each(function() {
-                $(this).text(newSubject); // Update subject in all rows
-            });
         });
 
         // Update attendance status
@@ -174,8 +149,7 @@ if (mysqli_num_rows($result) == 0) {
             $(".dashboard").addClass("full-width");
         }
     });
-</script>
-
+    </script>
 </head>
 <body>
 <nav>
@@ -245,11 +219,10 @@ if (mysqli_num_rows($result) == 0) {
             </tbody>
         </table>
         <div class="actions-container">
-    <button class="save-draft" onclick="window.location.href='savedraft.php';">Send Email</button>
-    <button class="attendance-report" onclick="window.location.href='attendancereport.php';">Attendance Report</button>
-    </form>
-</div>
-</div>
+            <button class="save-draft" onclick="window.location.href='savedraft.php';">Send Email</button>
+            <button class="attendance-report" onclick="window.location.href='attendancereport.php';">Attendance Report</button>
+        </div>
+    </div>
 </section>
 </body>
 </html>

@@ -63,6 +63,7 @@ $conn->close();
         <div class="form-group">
             <button onclick="generateEmails()">Generate Email Drafts</button>
         </div>
+        <a href="studentdata.php" class="back-link">Back to Student Attendance</a>
     </div>
     
     <script>
