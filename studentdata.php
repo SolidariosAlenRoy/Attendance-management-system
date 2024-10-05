@@ -10,9 +10,10 @@ $section_result = mysqli_query($conn, $section_query);
 
 // Fetch students filtered by section and subject
 $query = "
-    SELECT s.id, s.student_name, a.date, a.subject, a.time, a.attendance_status 
+    SELECT s.id, s.student_name, a.date, sub.subject_name AS subject, a.time, a.attendance_status 
     FROM students s
     LEFT JOIN attendance a ON s.id = a.student_id
+    LEFT JOIN subjects sub ON a.subject_id = sub.id
 ";
 
 $conditions = [];
@@ -24,7 +25,7 @@ if (!empty($selected_section) && $selected_section != 'select_section') {
 }
 
 if (!empty($selected_subject)) {
-    $conditions[] = "a.subject = ?";
+    $conditions[] = "sub.id = ?"; // Filter by subject ID
     $params[] = $selected_subject;
 }
 
@@ -51,7 +52,7 @@ if (mysqli_num_rows($result) == 0) {
         $output .= "<tr>";
         $output .= "<td>" . htmlspecialchars($row['student_name']) . "</td>";
         $output .= "<td class='date'>" . htmlspecialchars($row['date']) . "</td>";
-        $output .= "<td class='subject'>" . htmlspecialchars($row['subject'] ?? '') . "</td>";
+        $output .= "<td class='subject'>" . htmlspecialchars($row['subject']) . "</td>"; // Subject column
         $output .= "<td class='time'>" . htmlspecialchars($formattedTime) . "</td>";
         $output .= "<td>
                         <select class='attendance-status' data-student-id='" . $row['id'] . "'>
@@ -70,6 +71,7 @@ if (mysqli_num_rows($result) == 0) {
         $output .= "</tr>";
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -83,72 +85,76 @@ if (mysqli_num_rows($result) == 0) {
     <title>Student Attendance</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(document).ready(function() {
-        function fetchStudents() {
-            var selectedSection = $('#section').val();
-            var selectedSubject = $('#subject').val();
-            $.ajax({
-                type: 'POST',
-                url: 'fetchstudent.php',
-                data: {section: selectedSection, subject: selectedSubject},
-                success: function(data) {
-                    $('#student-table-body').html(data);                }
-            });
-        }
-
-        // Fetch students based on selected section or subject
-        $('#section, #subject').change(function() {
-            fetchStudents();
+$(document).ready(function() {
+    // Fetch students based on selected section and subject
+    function fetchStudents() {
+        var selectedSection = $('#section').val();
+        var selectedSubject = $('#subject').val(); // Get selected subject
+        $.ajax({
+            type: 'POST',
+            url: 'fetchstudent.php',
+            data: { section: selectedSection, subjects: selectedSubject }, // Send selected subject
+            success: function(data) {
+                $('#student-table-body').html(data); // Populate table
+            }
         });
+    }
 
-        // Update attendance status
-        $(document).on('change', '.attendance-status', function() {
-            var studentId = $(this).data('student-id');
-            var attendanceStatus = $(this).val();
-            $.ajax({
-                type: 'POST',
-                url: 'updateAttendance.php',
-                data: {id: studentId, status: attendanceStatus},
-                success: function(response) {
-                    console.log('Attendance updated:', response);
-                }
-            });
-        });
-
-        // Update current date and time in real-time
-        function updateDateTime() {
-            const now = new Date();
-            const formattedDate = now.toLocaleDateString();
-            const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            // Update all date and time cells dynamically
-            $('.date').each(function() {
-                $(this).text(formattedDate);
-            });
-            $('.time').each(function() {
-                $(this).text(formattedTime);
-            });
-        }
-
-        setInterval(updateDateTime, 1000);
-
-        // Sidebar toggle and localStorage handling
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        sidebarToggle.addEventListener('click', () => {
-            const sidebar = document.querySelector("nav");
-            const dashboard = document.querySelector(".dashboard");
-
-            sidebar.classList.toggle("close");
-            dashboard.classList.toggle("full-width");
-
-            localStorage.setItem("status", sidebar.classList.contains("close") ? "close" : "open");
-        });
-
-        if (localStorage.getItem("status") === "close") {
-            $("nav").addClass("close");
-            $(".dashboard").addClass("full-width");
-        }
+    // Fetch students when section or subject changes
+    $('#section, #subject').change(function() {
+        fetchStudents(); // Fetch data on change
     });
+
+    // Update attendance status
+    $(document).on('change', '.attendance-status', function() {
+        var studentId = $(this).data('student-id');
+        var attendanceStatus = $(this).val();
+        $.ajax({
+            type: 'POST',
+            url: 'updateAttendance.php',
+            data: { id: studentId, status: attendanceStatus },
+            success: function(response) {
+                console.log('Attendance updated:', response);
+            }
+        });
+    });
+
+    // Update current date and time in real-time
+    function updateDateTime() {
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString();
+        const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        // Update all date and time cells dynamically
+        $('.date').each(function() {
+            $(this).text(formattedDate);
+        });
+        $('.time').each(function() {
+            $(this).text(formattedTime);
+        });
+    }
+
+    setInterval(updateDateTime, 1000);
+
+    // Sidebar toggle and localStorage handling
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    sidebarToggle.addEventListener('click', () => {
+        const sidebar = document.querySelector("nav");
+        const dashboard = document.querySelector(".dashboard");
+
+        sidebar.classList.toggle("close");
+        dashboard.classList.toggle("full-width");
+
+        localStorage.setItem("status", sidebar.classList.contains("close") ? "close" : "open");
+    });
+
+    if (localStorage.getItem("status") === "close") {
+        $("nav").addClass("close");
+        $(".dashboard").addClass("full-width");
+    }
+});
+</script>
+
     </script>
 </head>
 <body>
@@ -208,14 +214,14 @@ if (mysqli_num_rows($result) == 0) {
                 <tr>
                     <th>Student Name</th>
                     <th>Date</th>
-                    <th>Subject</th>
+                    <th>Subject</th> <!-- Subject header -->
                     <th>Time</th>
                     <th>Attendance Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="student-table-body">
-                <?= $output; ?>
+                <?= $output ?> <!-- This will be replaced with the rows fetched from the database -->
             </tbody>
         </table>
         <div class="actions-container">

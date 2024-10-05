@@ -8,7 +8,7 @@ if ($conn->connect_error) {
 }
 
 // Fetch attendance data (this will run on page load, not just on form submission)
-$sql = "SELECT s.student_name, a.date, a.subject, a.time, a.attendance_status
+$sql = "SELECT s.student_name, a.date, a.subjects, a.time, a.attendance_status
         FROM students s
         JOIN attendance a ON s.id = a.student_id";
 $result = $conn->query($sql);
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['download'])) {
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['student_name']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['date']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['subject']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['subjects']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['time']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['attendance_status']) . "</td>";
                         echo "</tr>";

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $last_id = $conn->insert_id; // Get last inserted student ID
 
         // Insert into the 'attendance' table
-        $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, subject, time, attendance_status) VALUES (?, CURDATE(), '', CURTIME(), 'Select')");
+        $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, subjects, time, attendance_status) VALUES (?, CURDATE(), '', CURTIME(), 'Select')");
         $stmt_attendance->bind_param("i", $last_id);
 
         if ($stmt_attendance->execute()) {
@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close(); // Close student insert statement
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="text" id="guardian-phone" name="guardian-phone" required>
 
             <button type="submit">Add Student</button>
+            <a href="classlist.php" class="back-link">Back to Class List</a>
         </form>
     </div>
 </body>
