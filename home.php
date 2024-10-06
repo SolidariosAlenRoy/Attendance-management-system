@@ -37,6 +37,10 @@
                 <i class="uil uil-check-circle"></i>
                     <span class="link-name">Attendance Submit</span>
                 </a></li>
+                <li><a href="subject.php">
+                <i class="uil uil-subject"></i>
+                    <span class="link-name">Add Subject</span>
+                </a></li>
             </ul>
             
             <ul class="logout-mode">

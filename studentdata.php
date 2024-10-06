@@ -1,14 +1,19 @@
 <?php
-require_once("dbconnection.php");
+require_once("dbConnection.php");
 
-$selected_section = isset($_POST['section']) ? $_POST['section'] : '';
-$selected_subject = isset($_POST['subject']) ? $_POST['subject'] : '';
-
-// Fetch sections for the dropdown
+// Fetch distinct sections from the students table
 $section_query = "SELECT DISTINCT section FROM students";
 $section_result = mysqli_query($conn, $section_query);
 
-// Fetch students filtered by section and subject
+// Fetch subjects for the dropdown
+$subject_query = "SELECT id, subject_name FROM subjects";
+$subject_result = mysqli_query($conn, $subject_query);
+
+// Retrieve selected filters from POST
+$selected_section = isset($_POST['section']) ? $_POST['section'] : '';
+$selected_subject = isset($_POST['subject']) ? $_POST['subject'] : '';
+
+// Prepare the base query for fetching students
 $query = "
     SELECT s.id, s.student_name, a.date, sub.subject_name AS subject, a.time, a.attendance_status 
     FROM students s
@@ -16,32 +21,44 @@ $query = "
     LEFT JOIN subjects sub ON a.subject_id = sub.id
 ";
 
+// Initialize conditions and params arrays
 $conditions = [];
 $params = [];
 
-if (!empty($selected_section) && $selected_section != 'select_section') {
+// Filter by selected section
+if (!empty($selected_section) && $selected_section != 'All Sections') {
     $conditions[] = "s.section = ?";
     $params[] = $selected_section;
 }
 
+// Filter by selected subject
 if (!empty($selected_subject)) {
-    $conditions[] = "sub.id = ?"; // Filter by subject ID
+    $conditions[] = "sub.id = ?";
     $params[] = $selected_subject;
 }
 
+// Append conditions to the base query
 if (!empty($conditions)) {
     $query .= " WHERE " . implode(' AND ', $conditions);
 }
 
+// Order by student ID
 $query .= " ORDER BY s.id DESC";
 
+// Prepare the statement
 $stmt = mysqli_prepare($conn, $query);
+
+// Bind parameters dynamically
 if (!empty($params)) {
-    mysqli_stmt_bind_param($stmt, str_repeat("s", count($params)), ...$params);
+    $types = str_repeat("s", count($params)); // Assuming all params are strings; adjust types as necessary
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
 }
+
+// Execute the statement
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
+// Initialize output variable
 $output = '';
 if (mysqli_num_rows($result) == 0) {
     $output = "<tr><td colspan='6'>No students found for the selected filters.</td></tr>";
@@ -52,7 +69,7 @@ if (mysqli_num_rows($result) == 0) {
         $output .= "<tr>";
         $output .= "<td>" . htmlspecialchars($row['student_name']) . "</td>";
         $output .= "<td class='date'>" . htmlspecialchars($row['date']) . "</td>";
-        $output .= "<td class='subject'>" . htmlspecialchars($row['subject']) . "</td>"; // Subject column
+        $output .= "<td class='subject'>" . htmlspecialchars($row['subject']) . "</td>";
         $output .= "<td class='time'>" . htmlspecialchars($formattedTime) . "</td>";
         $output .= "<td>
                         <select class='attendance-status' data-student-id='" . $row['id'] . "'>
@@ -71,7 +88,6 @@ if (mysqli_num_rows($result) == 0) {
         $output .= "</tr>";
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -85,84 +101,63 @@ if (mysqli_num_rows($result) == 0) {
     <title>Student Attendance</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-$(document).ready(function() {
-    // Fetch students based on selected section and subject
-    function fetchStudents() {
-        var selectedSection = $('#section').val();
-        var selectedSubject = $('#subject').val(); // Get selected subject
-        $.ajax({
-            type: 'POST',
-            url: 'fetchstudent.php',
-            data: { section: selectedSection, subjects: selectedSubject }, // Send selected subject
-            success: function(data) {
-                $('#student-table-body').html(data); // Populate table
-            }
-        });
-    }
+    $(document).ready(function() {
+        function fetchStudents() {
+            var selectedSection = $('#section').val();
+            var selectedSubject = $('#subject').val();
+            $.ajax({
+                type: 'POST',
+                url: 'fetchstudent.php',
+                data: { section: selectedSection, subject: selectedSubject },
+                success: function(data) {
+                    $('#student-table-body').html(data);
+                }
+            });
+        }
 
-    // Fetch students when section or subject changes
-    $('#section, #subject').change(function() {
-        fetchStudents(); // Fetch data on change
+        $('#section').change(function() {
+            fetchStudents(); // Fetch data on change
+        });
+
+        // Update subject in the table when subject dropdown changes
+        $('#subject').change(function() {
+            var selectedSubject = $(this).find('option:selected').text(); // Get the selected subject text
+
+            $('.subject').each(function() {
+                $(this).text(selectedSubject); // Update each subject cell in the table
+            });
+        });
+
+        $(document).on('change', '.attendance-status', function() {
+            var studentId = $(this).data('student-id');
+            var attendanceStatus = $(this).val();
+            $.ajax({
+                type: 'POST',
+                url: 'updateAttendance.php',
+                data: { id: studentId, status: attendanceStatus },
+                success: function(response) {
+                    console.log('Attendance updated:', response);
+                }
+            });
+        });
+
+        // Update current date and time dynamically
+        setInterval(function() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString();
+            const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            $('.date').text(formattedDate);
+            $('.time').text(formattedTime);
+        }, 1000);
     });
-
-    // Update attendance status
-    $(document).on('change', '.attendance-status', function() {
-        var studentId = $(this).data('student-id');
-        var attendanceStatus = $(this).val();
-        $.ajax({
-            type: 'POST',
-            url: 'updateAttendance.php',
-            data: { id: studentId, status: attendanceStatus },
-            success: function(response) {
-                console.log('Attendance updated:', response);
-            }
-        });
-    });
-
-    // Update current date and time in real-time
-    function updateDateTime() {
-        const now = new Date();
-        const formattedDate = now.toLocaleDateString();
-        const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        // Update all date and time cells dynamically
-        $('.date').each(function() {
-            $(this).text(formattedDate);
-        });
-        $('.time').each(function() {
-            $(this).text(formattedTime);
-        });
-    }
-
-    setInterval(updateDateTime, 1000);
-
-    // Sidebar toggle and localStorage handling
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    sidebarToggle.addEventListener('click', () => {
-        const sidebar = document.querySelector("nav");
-        const dashboard = document.querySelector(".dashboard");
-
-        sidebar.classList.toggle("close");
-        dashboard.classList.toggle("full-width");
-
-        localStorage.setItem("status", sidebar.classList.contains("close") ? "close" : "open");
-    });
-
-    if (localStorage.getItem("status") === "close") {
-        $("nav").addClass("close");
-        $(".dashboard").addClass("full-width");
-    }
-});
-</script>
-
     </script>
+
+
 </head>
 <body>
 <nav>
     <div class="logo-name">
-        <div class="logo-image">
-            <img src="image/classtrack.png" alt="Class Track Logo">
-        </div>
+        <div class="logo-image"></div>
         <span class="logo_name">CLASS TRACK</span>
     </div>
 
@@ -171,12 +166,7 @@ $(document).ready(function() {
     </div>
 
     <div class="menu-items">
-        <ul class="nav-links">
-            <li><a href="home.php"><i class="uil uil-estate"></i><span class="link-name">Home</span></a></li>
-            <li><a href="studentdata.php"><i class="uil uil-user"></i><span class="link-name">Student Attendance</span></a></li>
-            <li><a href="attendancereport.php"><i class="uil uil-clipboard"></i><span class="link-name">Attendance Report</span></a></li>
-            <li><a href="savedraft.php"><i class="uil uil-check-circle"></i><span class="link-name">Attendance Submit</span></a></li>
-        </ul>
+        <ul class="nav-links"></ul>
         <ul class="logout-mode">
             <li><a href="login.php"><i class="uil uil-signout"></i><span class="link-name">Logout</span></a></li>
         </ul>
@@ -185,7 +175,7 @@ $(document).ready(function() {
 
 <section class="dashboard">
     <div class="container">
-        <form method="POST" class="controls">
+        <form method="POST" id="filters-form" class="controls">
             <label for="section">Section:</label>
             <select name="section" id="section">
                 <option value="">All Sections</option>
@@ -202,11 +192,20 @@ $(document).ready(function() {
 
             <label for="subject">Subject:</label>
             <select name="subject" id="subject">
-                <option value="">All Subjects</option>
-                <option value="Math" <?= $selected_subject == 'Math' ? 'selected' : '' ?>>Math</option>
-                <option value="Science" <?= $selected_subject == 'Science' ? 'selected' : '' ?>>Science</option>
-                <option value="English" <?= $selected_subject == 'English' ? 'selected' : '' ?>>English</option>
-            </select>
+                <option value="">Select a subject</option>
+                <?php 
+                if (mysqli_num_rows($subject_result) > 0) {
+                    while ($row = mysqli_fetch_assoc($subject_result)) {
+                        $selected = ($selected_subject == $row['id']) ? 'selected' : '';
+                        echo "<option value='".$row['id']."' $selected>".$row['subject_name']."</option>";
+                    }
+                } else {
+                    echo "<option value=''>No Subjects Available</option>";
+                }
+                ?>
+                </select>
+
+
         </form>
 
         <table>
@@ -214,21 +213,34 @@ $(document).ready(function() {
                 <tr>
                     <th>Student Name</th>
                     <th>Date</th>
-                    <th>Subject</th> <!-- Subject header -->
+                    <th>Subject</th>
                     <th>Time</th>
                     <th>Attendance Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="student-table-body">
-                <?= $output ?> <!-- This will be replaced with the rows fetched from the database -->
+                <?= $output ?>
             </tbody>
         </table>
+        
         <div class="actions-container">
-            <button class="save-draft" onclick="window.location.href='savedraft.php';">Send Email</button>
-            <button class="attendance-report" onclick="window.location.href='attendancereport.php';">Attendance Report</button>
+            <!-- Save Draft Button -->
+            <button class="save-draft" onclick="window.location.href='savedraft.php';">Save Draft</button>
+
+            <!-- Attendance Report Button -->
+            <form method="POST" action="attendancereport.php">
+                <input type="hidden" name="section" value="<?= htmlspecialchars($selected_section) ?>">
+                <input type="hidden" name="subject" value="<?= htmlspecialchars($selected_subject) ?>">
+                <button type="submit" class="attendance-report">Attendance Report</button>
+            </form>
         </div>
     </div>
 </section>
 </body>
 </html>
+
+<?php
+$stmt->close(); // Close the prepared statement
+$conn->close(); // Close the database connection
+?>

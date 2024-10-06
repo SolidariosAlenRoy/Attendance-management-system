@@ -1,17 +1,30 @@
 <?php
 require_once("dbConnection.php");
 
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Database connection
 $conn = new mysqli('localhost', 'root', '', 'students');
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch attendance data (this will run on page load, not just on form submission)
-$sql = "SELECT s.student_name, a.date, a.subjects, a.time, a.attendance_status
-        FROM students s
-        JOIN attendance a ON s.id = a.student_id";
-$result = $conn->query($sql);
+// Fetch attendance data
+$query = "
+    SELECT s.id, s.student_name, a.date, sub.subject_name AS subject, a.time, a.attendance_status 
+    FROM students s
+    LEFT JOIN attendance a ON s.id = a.student_id
+    LEFT JOIN subjects sub ON a.subject_id = sub.id
+    ORDER BY s.id DESC
+";
+$result = $conn->query($query); // Correctly using the query variable
+
+// Check if the query was successful
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 
 // Function to download CSV
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['download'])) {
@@ -21,13 +34,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['download'])) {
     $output = fopen('php://output', 'w');
     fputcsv($output, ['Student Name', 'Date', 'Subject', 'Time', 'Attendance Status']);
     
+    // Reset the result pointer to fetch data again for the CSV download
+    $result->data_seek(0); 
+
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            fputcsv($output, $row);
+            fputcsv($output, [
+                $row['student_name'] ?? '',
+                $row['date'] ?? '',
+                $row['subject'] ?? '',
+                $row['time'] ?? '',
+                $row['attendance_status'] ?? ''
+            ]);
         }
     }
     fclose($output);
-    exit();
+    exit(); // Ensure that the script stops after outputting CSV
 }
 ?>
 
@@ -55,15 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['download'])) {
             </thead>
             <tbody>
                 <?php
-                // Removed the POST condition here, so it runs on page load
+                // Display attendance records
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['student_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['date']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['subjects']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['time']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['attendance_status']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['student_name'] ?? '') . "</td>"; 
+                        echo "<td>" . htmlspecialchars($row['date'] ?? '') . "</td>";         
+                        echo "<td>" . htmlspecialchars($row['subject'] ?? '') . "</td>"; // Updated default value
+                        echo "<td>" . htmlspecialchars($row['time'] ?? '') . "</td>";         
+                        echo "<td>" . htmlspecialchars($row['attendance_status'] ?? '') . "</td>"; 
                         echo "</tr>";
                     }
                 } else {
@@ -85,5 +107,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['download'])) {
 </html>
 
 <?php
-$conn->close();
+$conn->close(); // Close the database connection
 ?>

@@ -10,7 +10,19 @@ if (isset($_GET['id'])) {
     $conn->begin_transaction();
 
     try {
-        // Step 1: Prepare the DELETE SQL query for attendance records
+        // Step 1: Prepare the DELETE SQL query for student_subjects
+        $deleteSubjectsQuery = "DELETE FROM student_subjects WHERE student_id = ?";
+        $subjectsStmt = $conn->prepare($deleteSubjectsQuery);
+
+        // Check if the query preparation was successful
+        if ($subjectsStmt) {
+            // Bind the 'id' parameter to the query
+            $subjectsStmt->bind_param("i", $idToDelete);
+            $subjectsStmt->execute();
+            $subjectsStmt->close();
+        }
+
+        // Step 2: Prepare the DELETE SQL query for attendance records
         $deleteAttendanceQuery = "DELETE FROM attendance WHERE student_id = ?";
         $attendanceStmt = $conn->prepare($deleteAttendanceQuery);
 
@@ -22,7 +34,7 @@ if (isset($_GET['id'])) {
             $attendanceStmt->close();
         }
 
-        // Step 2: Prepare the DELETE SQL query for students
+        // Step 3: Prepare the DELETE SQL query for students
         $deleteQuery = "DELETE FROM students WHERE id = ?";
         $deleteStmt = $conn->prepare($deleteQuery);
 
@@ -63,4 +75,5 @@ if (isset($_GET['id'])) {
 
 // Close the database connection
 $conn->close();
+
 ?>
