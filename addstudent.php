@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->execute()) {
         $last_id = $conn->insert_id; // Get last inserted student ID
 
-        // Insert into the 'attendance' table
-        $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, subjects, time, attendance_status) VALUES (?, CURDATE(), '', CURTIME(), 'Select')");
+        // Insert into the 'attendance' table (use NULL or a default value for subject for now)
+        $stmt_attendance = $conn->prepare("INSERT INTO attendance (student_id, date, time, attendance_status) VALUES (?, CURDATE(), CURTIME(), 'Select')");
         $stmt_attendance->bind_param("i", $last_id);
 
         if ($stmt_attendance->execute()) {
@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close(); // Close student insert statement
 }
 ?>
+
 
 
 <!DOCTYPE html>

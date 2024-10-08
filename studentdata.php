@@ -231,7 +231,7 @@ if (mysqli_num_rows($result) == 0) {
             <!-- Attendance Report Button -->
             <form method="POST" action="attendancereport.php">
                 <input type="hidden" name="section" value="<?= htmlspecialchars($selected_section) ?>">
-                <input type="hidden" name="subject" value="<?= htmlspecialchars($selected_subject) ?>">
+                <input type="hidden" name="subject_id" value="<?= htmlspecialchars($selected_subject) ?>">
                 <button type="submit" class="attendance-report">Attendance Report</button>
             </form>
         </div>
