@@ -1,35 +1,80 @@
 body {
-  background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(175,222,213,1) 100%); 
+  background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(175, 222, 213, 1) 100%);
 }
+
 body .container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   padding: 0 30px;
-  background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(175,222,213,1) 100%);
+  perspective: 1000px; 
+}
+
+.flip-card {
+  width: 500px; 
+  height: 500px; 
+  position: relative;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s; 
+  transform-style: preserve-3d; 
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden; 
+  border-radius: 15px;  
+}
+
+.flip-card-front {
+  background: transparent; 
 }
 
 .image-container {
-  width: 40%; 
+  width: 100%; 
+  height: 100%; 
+  border-radius: 10px; 
+  overflow: hidden; 
 }
 
 .side-image {
-  width: 80%; 
-  height: auto;
-  border-radius: 25px ;
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+.flip-card-back {
+  background-color: rgba(244, 244, 244, 0.8); 
+  backdrop-filter: blur(20px); 
+  padding: 30px;
+  border-radius: 15px; 
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transform: rotateY(180deg); 
 }
 
 .login-container {
-  width: 30%; 
-  background-color: #f4f4f4;
-  padding: 30px; 
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%; 
+  height: 100%; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
 }
 
 p {
   text-align: center;
+  color: #333;
+  font-size: 20px;
+}
+
+a{
   color: #333;
   font-weight: bold;
 }
@@ -40,35 +85,18 @@ p {
 
 .input-group label {
   display: block;
-  font-size: 14px; 
+  font-size: 14px;
   margin-bottom: 6px;
   color: #333;
 }
 
 .input-group input {
   width: 100%;
-  padding: 8px; 
+  padding: 8px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-.remember-me {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.remember-me input[type="checkbox"] {
-  margin-right: 5px; 
-  display: inline; /* Change display property */
-}
-
-.remember-me label {
-  font-size: 14px;
-  color: #333;
-  display: inline; /* Change display property */
-}
-
 
 .reg-link {
   font-size: 16px;
@@ -77,9 +105,7 @@ p {
   background-color: #f4f4f4;
   justify-content: center;
   display: flex;
-
 }
-
 
 .login-btn {
   width: 100%;
@@ -96,7 +122,6 @@ p {
   background-color: #555;
 }
 
-/* Styling the dropdown (select) menu */
 .input-group select {
   width: 100%;
   padding: 8px;
@@ -108,9 +133,9 @@ p {
 }
 
 .input-group select:focus {
-  border-color: #333; /* Changes border color when focused */
-  outline: none;      /* Removes the default outline */
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow on focus */
+  border-color: #333; 
+  outline: none;      
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); 
 }
 
 .input-group select option {
@@ -118,10 +143,14 @@ p {
   font-size: 14px;
 }
 
-/* Styling the error message */
 #error-message {
   color: red;
   font-size: 14px;
   margin-bottom: 20px;
   text-align: center;
+}
+
+
+.flip-card-inner {
+  cursor: pointer; 
 }
