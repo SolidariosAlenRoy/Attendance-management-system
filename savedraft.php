@@ -31,6 +31,55 @@ $conn->close();
     <link rel="stylesheet" href="css/savedraft.css">
 </head>
 <body>
+<nav>
+        <div class="logo-name">
+            <div class="logo-image">
+               <img src="image/classtrack.png" alt="">
+            </div>
+
+            <span class="logo_name">CLASS TRACK</span>
+        </div>
+
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li><a href="home.php">
+                    <i class="uil uil-estate"></i>
+                    <span class="link-name">Home</span>
+                </a></li>
+                <li><a href="studentdata.php">
+                <i class="uil uil-user"></i>
+                    <span class="link-name">Student Attendance</span>
+                </a></li>
+                <li><a href="attendancereport.php">
+                    <i class="uil uil-clipboard"></i>
+                    <span class="link-name">Attendance Report</span>
+                </a></li>
+                <li><a href="subject.php">
+                <i class="uil uil-subject"></i>
+                    <span class="link-name">Add Subject</span>
+                </a></li>
+            </ul>
+            
+            <ul class="logout-mode">
+                <li><a href="login.php">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name">Logout</span>
+                </a></li>
+
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                    <span class="link-name">Dark Mode</span>
+                </a>
+
+                <div class="mode-toggle">
+                  <span class="switch"></span>
+                </div>
+            </li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
         <h1>Absent Students Notification</h1>
         <div class="students-list">
