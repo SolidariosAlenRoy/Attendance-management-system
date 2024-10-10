@@ -8,14 +8,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     $institution = $_POST['institution'];
+    $department = $_POST['department'];
 
     if ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO users (username, password, institution) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $hashed_password, $institution);
+        $stmt = $conn->prepare("INSERT INTO users (username, password, institution, department) VALUES (?, ?, ?, ('CABECS','CHAP','CASE','COE', 'BED'))");
+        $stmt->bind_param("sss", $username, $hashed_password, $institution, $department);
 
         if ($stmt->execute()) {
 
@@ -62,6 +63,17 @@ $conn->close();
           <label for="confirm_password">Confirm Password</label>
           <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
         </div>
+         <div class="input-group">
+           <label for="department">Department</label>
+              <select id="department" name="dept" required>
+                <option value="" disabled selected>Select your Department</option>
+                <option value="cabecs">CABECS</option>
+                <option value="chap">CHAP</option>
+                <option value="coe">COE</option>
+                <option value="case">CASE</option>
+                <option value="case">BED</option>
+              </select>
+         </div>
         <div class="input-group">
           <label for="institution">Institution</label>
           <input type="text" id="institution" name="institution" placeholder="Type your Institution" required>

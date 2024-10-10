@@ -4,6 +4,7 @@ include 'dbconnection.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $department = $_POST['department'];  // Capture the department from the form
     
     $sql = "SELECT * FROM users WHERE username='$username'";
     $result = mysqli_query($conn, $sql);
@@ -15,7 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Login successful
             session_start();
             $_SESSION['username'] = $username;
-            header('Location: home.php');
+            $_SESSION['department'] = $department;  // Store the department in the session
+            
+            header('Location: home.php');  // Redirect to home page
         } else {
             echo "Invalid password.";
         }
@@ -26,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_close($conn);
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -59,12 +63,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <div class="input-group">
                                 <label for="department">Department</label>
-                                <select id="dept" name="dept" required>
+                                <select id="department" name="dept" required>
                                     <option value="" disabled selected>Select your Department</option>
                                     <option value="cabecs">CABECS</option>
                                     <option value="chap">CHAP</option>
                                     <option value="coe">COE</option>
                                     <option value="case">CASE</option>
+                                    <option value="case">BED</option>
                                 </select>
                             </div>
                             <div id="error-message"></div>
