@@ -80,8 +80,9 @@ if (mysqli_num_rows($result) == 0) {
     <title>Attendance Report</title>
     <link rel="stylesheet" href="css/attendancereport.css">
 </head>
-
+<body>
 <nav>
+    
         <div class="logo-name">
             <div class="logo-image">
                <img src="image/classtrack.png" alt="">
@@ -134,7 +135,6 @@ if (mysqli_num_rows($result) == 0) {
         </div>
     </nav>
 
-<body>
     <table>
         <thead>
             <tr>

@@ -1,54 +1,29 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
 }
 
 .container {
-    max-width: 1000px;
-    margin: auto;
-    background: white;
+    max-width: 1100px;
+    margin-left: auto; /* This pushes the container to the right */
+    margin-right: 80px; /* Optional: Adds a margin to the right side */
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-    text-align: center;
+h1, h2 {
+    color: #333;
     margin-bottom: 20px;
 }
 
-/* Table styling */
-table {
-    width: 100%; /* Set a width that allows for margins */
-    max-width: 1000px; /* Optional: Limit the maximum width of the table */
-    border-collapse: collapse;
-    margin: 20px auto; /* Center the table and give it top/bottom margin */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
-}
-
-table, th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-}
-
-th {
-    background-color: #007bff;
-    color: white;
-}
-
-/* Row hover effect */
-tbody tr:hover {
-    background-color: #f1f1f1; /* Light gray background on hover */
-}
-
-
-.back-link {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-}
 /* ===== Google Font Import - Poppins ===== */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
 *{
@@ -235,4 +210,96 @@ body.dark .nav-links li a:hover .link-name{
 }
 body.dark .switch:before{
     left: 20px;
+}
+/* Form Styles */
+form {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.back-link {
+    color: #4CAF50;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #388E3C;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead {
+    background-color: #4CAF50;
+    color: white;
+}
+
+thead th {
+    padding: 12px;
+    text-align: left;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+    background-color: #e0f7fa;
+}
+
+tbody td {
+    padding: 12px;
+    text-align: left;
+}
+
+tbody td a {
+    color: #f44336;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+tbody td a:hover {
+    color: #d32f2f;
 }
