@@ -8,15 +8,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     $institution = $_POST['institution'];
-    $department = $_POST['department'];
 
     if ($password !== $confirm_password) {
         $error_message = "Passwords do not match.";
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO users (username, password, institution, department) VALUES (?, ?, ?, ('CABECS','CHAP','CASE','COE', 'BED'))");
-        $stmt->bind_param("sss", $username, $hashed_password, $institution, $department);
+        $stmt = $conn->prepare("INSERT INTO users (username, password, institution) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $hashed_password, $institution);
 
         if ($stmt->execute()) {
 
