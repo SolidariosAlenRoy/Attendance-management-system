@@ -1,5 +1,5 @@
 Array
 (
-    [section] => 1
+    [section] => 
     [subject] => 
 )
