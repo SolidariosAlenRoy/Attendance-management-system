@@ -14,8 +14,9 @@ $selected_section = isset($_POST['section']) ? $_POST['section'] : '';
 $selected_subject = isset($_POST['subject']) ? $_POST['subject'] : '';
 
 // Prepare the base query for fetching students
+// Prepare the base query for fetching students
 $query = "
-    SELECT s.id, s.student_name, a.date, sub.subject_name AS subject, a.time, a.attendance_status 
+    SELECT s.id AS student_id, s.student_name, a.date, sub.id AS subject_id, sub.subject_name AS subject, a.time, a.attendance_status 
     FROM students s
     LEFT JOIN attendance a ON s.id = a.student_id
     LEFT JOIN subjects sub ON a.subject_id = sub.id
@@ -24,6 +25,10 @@ $query = "
 // Initialize conditions and params arrays
 $conditions = [];
 $params = [];
+
+// Debugging output for selected filters
+echo "Selected Section: " . $selected_section . "<br>";
+echo "Selected Subject: " . $selected_subject . "<br>";
 
 // Filter by selected section
 if (!empty($selected_section) && $selected_section != 'All Sections') {
@@ -41,8 +46,6 @@ if (!empty($selected_subject)) {
 if (!empty($conditions)) {
     $query .= " WHERE " . implode(' AND ', $conditions);
 }
-
-// Order by student ID
 $query .= " ORDER BY s.id DESC";
 
 // Prepare the statement
@@ -50,17 +53,26 @@ $stmt = mysqli_prepare($conn, $query);
 
 // Bind parameters dynamically
 if (!empty($params)) {
-    $types = str_repeat("s", count($params)); // Assuming all params are strings; adjust types as necessary
+    $types = str_repeat("s", count($params)); // Adjust based on actual data types
     mysqli_stmt_bind_param($stmt, $types, ...$params);
 }
 
 // Execute the statement
-mysqli_stmt_execute($stmt);
+if (!mysqli_stmt_execute($stmt)) {
+    echo "Execution Error: " . mysqli_error($conn); // Log execution errors
+}
 $result = mysqli_stmt_get_result($stmt);
+
+
+
 
 // Initialize output variable
 $output = '';
 if (mysqli_num_rows($result) == 0) {
+    // Debugging output
+echo "Selected Section: " . htmlspecialchars($selected_section) . "<br>";
+echo "Selected Subject: " . htmlspecialchars($selected_subject) . "<br>";
+
     $output = "<tr><td colspan='6'>No students found for the selected filters.</td></tr>";
 } else {
     while ($row = mysqli_fetch_assoc($result)) {
@@ -69,10 +81,17 @@ if (mysqli_num_rows($result) == 0) {
         $output .= "<tr>";
         $output .= "<td>" . htmlspecialchars($row['student_name']) . "</td>";
         $output .= "<td class='date'>" . htmlspecialchars($row['date']) . "</td>";
-        $output .= "<td class='subject'>" . htmlspecialchars($row['subject']) . "</td>";
+        
+        // Now 'subject_id' should be available
+        if (!empty($row['subject_id'])) {
+            $output .= "<td class='subject' data-subject-id='" . htmlspecialchars($row['subject_id']) . "'>" . htmlspecialchars($row['subject']) . "</td>";
+        } else {
+            $output .= "<td class='subject'>No subject assigned</td>";
+        }
+        
         $output .= "<td class='time'>" . htmlspecialchars($formattedTime) . "</td>";
         $output .= "<td>
-                        <select class='attendance-status' data-student-id='" . $row['id'] . "'>
+                        <select class='attendance-status' data-student-id='" . $row['student_id'] . "'>
                             <option value=''>Select</option>
                             <option value='Present' " . ($row['attendance_status'] == 'Present' ? 'selected' : '') . ">Present</option>
                             <option value='Absent' " . ($row['attendance_status'] == 'Absent' ? 'selected' : '') . ">Absent</option>
@@ -81,8 +100,8 @@ if (mysqli_num_rows($result) == 0) {
                     </td>";
         $output .= "<td>
                         <div class='btn-container'>
-                            <a class='update-btn' href='updatestudent.php?id=" . $row['id'] . "'>Update</a> | 
-                            <a class='delete-btn' href='delete.php?id=" . $row['id'] . "' onClick=\"return confirm('Are you sure you want to delete?')\">Delete</a> 
+                            <a class='update-btn' href='updatestudent.php?id=" . $row['student_id'] . "'>Update</a> | 
+                            <a class='delete-btn' href='delete.php?id=" . $row['student_id'] . "' onClick=\"return confirm('Are you sure you want to delete?')\">Delete</a> 
                         </div>
                     </td>";
         $output .= "</tr>";
@@ -103,30 +122,48 @@ if (mysqli_num_rows($result) == 0) {
     <script>
     $(document).ready(function() {
         function fetchStudents() {
-            var selectedSection = $('#section').val();
-            var selectedSubject = $('#subject').val();
-            $.ajax({
-                type: 'POST',
-                url: 'fetchstudent.php',
-                data: { section: selectedSection, subject: selectedSubject },
-                success: function(data) {
-                    $('#student-table-body').html(data);
-                }
-            });
+    var selectedSection = $('#section').val();
+    var selectedSubject = $('#subject-select').val(); // Ensure you're fetching the right subject ID
+    console.log("Fetching students with Section: " + selectedSection + ", Subject: " + selectedSubject); // Add this line
+    $.ajax({
+        type: 'POST',
+        url: 'fetchstudent.php',
+        data: { section: selectedSection, subject: selectedSubject },
+        success: function(data) {
+            console.log("Response Data: " + data); // Log the response data
+            $('#student-table-body').html(data);
         }
+    });
+}
 
-        $('#section').change(function() {
-            fetchStudents(); // Fetch data on change
-        });
+
+
+    $('#section').change(function() {
+        fetchStudents(); // Fetch data on change
+    });
+
+    $('#subject-select').change(function() {
+        fetchStudents(); // Fetch data when subject changes
+    });
 
         // Update subject in the table when subject dropdown changes
-        $('#subject').change(function() {
-            var selectedSubject = $(this).find('option:selected').text(); // Get the selected subject text
+        // Update subject in the table when subject dropdown changes
+        $(document).ready(function() {
+    $('#subject-select').on('change', function() {
+        var selectedSubject = $(this).val();
 
-            $('.subject').each(function() {
-                $(this).text(selectedSubject); // Update each subject cell in the table
-            });
-        });
+        // Show all rows initially
+        $('tbody tr').show();
+
+        // If a subject is selected, hide rows that do not match
+        if (selectedSubject) {
+            $('tbody tr').filter(function() {
+                return $(this).find('.subject').text() !== selectedSubject;
+            }).hide();
+        }
+    });
+});
+
 
         $(document).on('change', '.attendance-status', function() {
             var studentId = $(this).data('student-id');
@@ -223,19 +260,20 @@ if (mysqli_num_rows($result) == 0) {
             </select>
 
             <label for="subject">Subject:</label>
-            <select name="subject" id="subject">
-                <option value="">Select a subject</option>
-                <?php 
-                if (mysqli_num_rows($subject_result) > 0) {
-                    while ($row = mysqli_fetch_assoc($subject_result)) {
-                        $selected = ($selected_subject == $row['id']) ? 'selected' : '';
-                        echo "<option value='".$row['id']."' $selected>".$row['subject_name']."</option>";
-                    }
-                } else {
-                    echo "<option value=''>No Subjects Available</option>";
-                }
-                ?>
-                </select>
+<select name="subject" id="subject-select">
+    <option value="">Select a subject</option>
+    <?php 
+    if (mysqli_num_rows($subject_result) > 0) {
+        while ($row = mysqli_fetch_assoc($subject_result)) {
+            echo "<option value='".$row['id']."' ".($selected_subject == $row['id'] ? "selected" : "").">".$row['subject_name']."</option>";
+        }
+    } else {
+        echo "<option value=''>No Subjects Available</option>";
+    }
+    ?>
+</select>
+
+
 
 
         </form>
