@@ -18,7 +18,7 @@ $selected_subject = isset($_POST['subject']) ? $_POST['subject'] : '';
 $query = "
     SELECT s.id AS student_id, s.student_name, a.date, sub.id AS subject_id, sub.subject_name AS subject, a.time, a.attendance_status 
     FROM students s
-    LEFT JOIN attendance a ON s.id = a.student_id
+   
     LEFT JOIN subjects sub ON a.subject_id = sub.id
 ";
 
